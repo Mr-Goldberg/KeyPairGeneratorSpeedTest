@@ -46,17 +46,28 @@ public class MainActivity extends AppCompatActivity
             start_button.setEnabled(false);
             time_text.setText("Started");
 
-            mainThreadHandler.post(() ->
-            {
-                AsyncTask.execute(() ->
-                {
-                    KeypairGenerationResult res = generateKeypair("alias_of_key");
+            generateKeypairAsync();
+        });
+    }
 
-                    mainThreadHandler.post(() ->
-                    {
-                        start_button.setEnabled(true);
-                        time_text.setText(String.format("Time: %.2f", res.generationTimeMs / 1000.0));
-                    });
+    private void generateKeypairAsync()
+    {
+        // Main thread
+
+        mainThreadHandler.post(() ->
+        {
+            AsyncTask.execute(() ->
+            {
+                // Background thread
+
+                KeypairGenerationResult res = generateKeypair("alias_of_key");
+
+                mainThreadHandler.post(() ->
+                {
+                    // Main thread
+
+                    start_button.setEnabled(true);
+                    time_text.setText(String.format("Time: %.2f", res.generationTimeMs / 1000.0));
                 });
             });
         });
@@ -84,13 +95,13 @@ public class MainActivity extends AppCompatActivity
 
             Log.d(TAG, "start");
 
-            long start = System.currentTimeMillis();
-            KeyPair kp = generatorOfKeyPairs.generateKeyPair();
-            long diff = System.currentTimeMillis() - start;
+            long timeStart = System.currentTimeMillis();
+            KeyPair keyPair = generatorOfKeyPairs.generateKeyPair();
+            long timeDiff = System.currentTimeMillis() - timeStart;
 
-            Log.d(TAG, "end, time ms: " + diff);
+            Log.d(TAG, "end, time ms: " + timeDiff);
 
-            return new KeypairGenerationResult(kp, diff);
+            return new KeypairGenerationResult(keyPair, timeDiff);
         }
         catch (GeneralSecurityException ex)
         {
