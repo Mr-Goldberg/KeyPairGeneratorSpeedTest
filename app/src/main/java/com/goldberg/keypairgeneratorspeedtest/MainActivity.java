@@ -73,6 +73,9 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Method to generate KeyPair synchronously.
+     */
     private static KeypairGenerationResult generateKeypair(String aliasOfKey)
     {
         Calendar dateValidFrom = Calendar.getInstance();
